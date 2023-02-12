@@ -1,10 +1,9 @@
 package com.hallikalli.android.study.lint.checker
 
+import Stubs.CollectionStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
-import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import java.io.File
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -28,7 +27,17 @@ class CollectionsUseOrNullDetectorTest : LintDetectorTest() {
                     """
                         class Test {
                             fun test(){
+                                arrayListOf<Int>().getOrNull(0)
+                                doubleArrayOf().getOrNull(0)
+                                floatArrayOf().getOrNull(0)
+                                longArrayOf().getOrNull(0)
+                                intArrayOf().getOrNull(0)
+                                charArrayOf().getOrNull(0)
+                                shortArrayOf().getOrNull(0)
+                                byteArrayOf().getOrNull(0)
+                                booleanArrayOf().getOrNull(0)
                                 val list = listOf<Int>()
+                                list.getOrNull(0)
                                 list.firstOrNull()
                                 list.lastOrNull()
                                 list.maxOrNull()
@@ -53,62 +62,43 @@ class CollectionsUseOrNullDetectorTest : LintDetectorTest() {
     @Test
     fun expectFail() {
         lint()
+            .allowMissingSdk(true)
             .files(
-                STUB_COLLECTIONS,
-                   kotlin(
-                       """
-                        package com.hallikalli.android.study.lint
-
-                        import kotlin.collections.*
-                        import kotlin.collections.max 
-
+                CollectionStub.STUB_COLLECTIONS,
+                kotlin(
+                    """
                         class Test {
                             fun test(){
-                                val list = listOf<Int>()
-                                list.first()
-                                list.last()
-                                list.max()
-                                list.maxBy { it }
-                                list.maxOf { it }
-                                list.maxOfWith(compareBy { it }) { it }
-                                list.maxWith(compareBy { it })
-                                list.min()
-                                list.minBy { it }
-                                list.minOf { it }
-                                list.minOfWith(compareBy { it }) { it }
-                                list.minWith(compareBy { it })
+                                doubleArrayOf()[1]
+                                floatArrayOf()[3]
+                                longArrayOf()[4]
+                                intArrayOf()[5]
+                                charArrayOf()[6]
+                                shortArrayOf()[7]
+                                byteArrayOf()[8]
+                                booleanArrayOf()[9]
+//                                val list = listOf<Int>()
+//                                list.get(1)
+//                                list[0]
+//                                list.first()
+//                                list.last()
+//                                list.max()
+//                                list.maxBy { it }
+//                                list.maxOf { it }
+//                                list.maxOfWith(compareBy { it }) { it }
+//                                list.maxWith(compareBy { it })
+//                                list.min()
+//                                list.minBy { it }
+//                                list.minOf { it }
+//                                list.minOfWith(compareBy { it }) { it }
+//                                list.minWith(compareBy { it })
                             }
                         }
                     """.trimIndent()
-                   ).indented()
-            ).sdkHome(File("/Users/jadelee/Library/Android/sdk"))
+                ).indented()
+            )
             .run()
-            .expectWarningCount(12)
+            .expectWarningCount(22)
     }
 }
-
-private val STUB_COLLECTIONS = LintDetectorTest.kotlin(
-    """
-    package kotlin.collections
-    
-    public fun <T : Comparable<T>> Iterable<T>.max(): T? {
-        return maxOrNull()
-    }
-    inline fun <T, R : Comparable<R>> Iterable<T>.maxBy(selector: (T) -> R): T? {
-        return maxByOrNull(selector)
-    }
-    fun <T> Iterable<T>.maxWith(comparator: Comparator<in T>): T? {
-        return maxWithOrNull(comparator)
-    }
-    fun <T : Comparable<T>> Iterable<T>.min(): T? {
-        return minOrNull()
-    }
-    inline fun <T, R : Comparable<R>> Iterable<T>.minBy(selector: (T) -> R): T? {
-        return minByOrNull(selector)
-    }
-    fun <T> Iterable<T>.minWith(comparator: Comparator<in T>): T? {
-        return minWithOrNull(comparator)
-    }
-     """.trimIndent()
-).indented()
 

@@ -10,6 +10,9 @@ class IssueRegistry : IssueRegistry() {
     override val issues: List<Issue>
         get() = listOf(
             CollectionsUseOrNullDetector.ISSUE,
-            ReferenceViewIdXmlDetector.ISSUE
+            ReferenceViewIdXmlDetector.ISSUE,
+            NamingPatternViewHolderDetector.ISSUE,
+            ViewIdPatternXmlDetector.ISSUE,
+            CodeConventionPrefixSuffixPatternDetector.ISSUE
         )
 }
